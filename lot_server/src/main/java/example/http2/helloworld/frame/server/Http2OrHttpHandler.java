@@ -14,11 +14,10 @@
  */
 package example.http2.helloworld.frame.server;
 
+import example.http2.helloworld.server.HelloWorldHttp1Handler;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.example.http2.helloworld.server.HelloWorldHttp1Handler;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
-import io.netty.handler.codec.http2.Http2FrameCodec;
 import io.netty.handler.codec.http2.Http2FrameCodecBuilder;
 import io.netty.handler.ssl.ApplicationProtocolNames;
 import io.netty.handler.ssl.ApplicationProtocolNegotiationHandler;

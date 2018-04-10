@@ -15,7 +15,7 @@
  */
 package example.udt.echo.rendezvousBytes;
 
-import io.netty.example.udt.echo.rendezvous.Config;
+import example.udt.echo.rendezvous.Config;
 import io.netty.util.internal.SocketUtils;
 
 import java.net.InetSocketAddress;

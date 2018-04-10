@@ -18,11 +18,11 @@ package example.worldclock;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.example.worldclock.WorldClockProtocol.Continent;
-import io.netty.example.worldclock.WorldClockProtocol.LocalTime;
-import io.netty.example.worldclock.WorldClockProtocol.LocalTimes;
-import io.netty.example.worldclock.WorldClockProtocol.Location;
-import io.netty.example.worldclock.WorldClockProtocol.Locations;
+import example.worldclock.WorldClockProtocol.Continent;
+import example.worldclock.WorldClockProtocol.LocalTime;
+import example.worldclock.WorldClockProtocol.LocalTimes;
+import example.worldclock.WorldClockProtocol.Location;
+import example.worldclock.WorldClockProtocol.Locations;
 
 import java.util.ArrayList;
 import java.util.Collection;
