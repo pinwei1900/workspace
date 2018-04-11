@@ -40,20 +40,9 @@ import io.netty.util.CharsetUtil;
  */
 public final class FileServer {
 
-    static final boolean SSL = System.getProperty("ssl") != null;
-    // Use the same default port with the telnet example so that we can use the telnet client example to access it.
-    static final int PORT = Integer.parseInt(System.getProperty("port", SSL? "8992" : "8023"));
+    static final int PORT = Integer.parseInt(System.getProperty("port",  "8023"));
 
     public static void main(String[] args) throws Exception {
-        // Configure SSL.
-        final SslContext sslCtx;
-        if (SSL) {
-            SelfSignedCertificate ssc = new SelfSignedCertificate();
-            sslCtx = SslContextBuilder.forServer(ssc.certificate(), ssc.privateKey()).build();
-        } else {
-            sslCtx = null;
-        }
-
         // Configure the server.
         EventLoopGroup bossGroup = new NioEventLoopGroup(1);
         EventLoopGroup workerGroup = new NioEventLoopGroup();
@@ -67,12 +56,7 @@ public final class FileServer {
                  @Override
                  public void initChannel(SocketChannel ch) throws Exception {
                      ChannelPipeline p = ch.pipeline();
-                     if (sslCtx != null) {
-                         p.addLast(sslCtx.newHandler(ch.alloc()));
-                     }
                      p.addLast(
-                             new StringEncoder(CharsetUtil.UTF_8),
-                             new LineBasedFrameDecoder(8192),
                              new StringDecoder(CharsetUtil.UTF_8),
                              new ChunkedWriteHandler(),
                              new FileServerHandler());

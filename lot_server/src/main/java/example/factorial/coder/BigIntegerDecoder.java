@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package example.factorial;
+package example.factorial.coder;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -42,13 +42,13 @@ public class BigIntegerDecoder extends ByteToMessageDecoder {
 
         // Check the magic number.
         int magicNumber = in.readUnsignedByte();
-        if (magicNumber != 'F') {
+        if (magicNumber != 'F') { //首先第一个字节应该是F
             in.resetReaderIndex();
             throw new CorruptedFrameException("Invalid magic number: " + magicNumber);
         }
 
         // Wait until the whole data is available.
-        int dataLength = in.readInt();
+        int dataLength = in.readInt(); //随后的一个字节，表示了这个数字的长度
         if (in.readableBytes() < dataLength) {
             in.resetReaderIndex();
             return;

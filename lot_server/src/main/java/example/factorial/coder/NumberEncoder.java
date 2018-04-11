@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package example.factorial;
+package example.factorial.coder;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -38,11 +38,9 @@ public class NumberEncoder extends MessageToByteEncoder<Number> {
             v = new BigInteger(String.valueOf(msg));
         }
 
-        // Convert the number into a byte array.
         byte[] data = v.toByteArray();
         int dataLength = data.length;
 
-        // Write a message.
         out.writeByte((byte) 'F'); // magic number
         out.writeInt(dataLength);  // data length
         out.writeBytes(data);      // data

@@ -34,7 +34,6 @@ public class FactorialServerHandler extends SimpleChannelInboundHandler<BigInteg
 
     @Override
     public void channelRead0(ChannelHandlerContext ctx, BigInteger msg) throws Exception {
-        // Calculate the cumulative factorial and send it to the client.
         lastMultiplier = msg;
         factorial = factorial.multiply(msg);
         ctx.writeAndFlush(factorial);
