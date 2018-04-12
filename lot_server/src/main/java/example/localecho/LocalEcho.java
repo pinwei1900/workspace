@@ -17,8 +17,10 @@ package example.localecho;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.DefaultEventLoopGroup;
 import io.netty.channel.EventLoopGroup;
@@ -38,7 +40,7 @@ public final class LocalEcho {
 
     public static void main(String[] args) throws Exception {
         // Address to bind on / connect to.
-        final LocalAddress addr = new LocalAddress(PORT);
+        final LocalAddress addr = new LocalAddress("hello ");
 
         EventLoopGroup serverGroup = new DefaultEventLoopGroup();
         EventLoopGroup clientGroup = new NioEventLoopGroup(); // NIO event loops are also OK
@@ -82,6 +84,18 @@ public final class LocalEcho {
             // Start the client.
             Channel ch = cb.connect(addr).sync().channel();
 
+            ChannelFutureListener trafficGenerator = new ChannelFutureListener() {
+                @Override
+                public void operationComplete(ChannelFuture future) {
+                    if (future.isSuccess()) {
+                        System.out.println("成功");
+                    } else {
+                        future.cause().printStackTrace();
+                        future.channel().close();
+                    }
+                }
+            };
+
             // Read commands from the stdin.
             System.out.println("Enter text (quit to end)");
             ChannelFuture lastWriteFuture = null;
@@ -91,9 +105,10 @@ public final class LocalEcho {
                 if (line == null || "quit".equalsIgnoreCase(line)) {
                     break;
                 }
-
+//                ByteBuf content = ch.alloc().directBuffer(13).writeZero(13);
                 // Sends the received line to the server.
-                lastWriteFuture = ch.writeAndFlush(line);
+//                ch.writeAndFlush(content);
+                lastWriteFuture = ch.writeAndFlush(line).addListener(trafficGenerator);
             }
 
             // Wait until all messages are flushed before closing the channel.
@@ -105,4 +120,7 @@ public final class LocalEcho {
             clientGroup.shutdownGracefully();
         }
     }
+
+
+
 }

@@ -22,7 +22,6 @@ public class LocalEchoServerHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
-        // Write back as received
         ctx.write(msg);
     }
 

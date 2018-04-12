@@ -38,20 +38,10 @@ import java.io.InputStreamReader;
  */
 public final class MemcacheClient {
 
-    static final boolean SSL = System.getProperty("ssl") != null;
     static final String HOST = System.getProperty("host", "127.0.0.1");
     static final int PORT = Integer.parseInt(System.getProperty("port", "11211"));
 
     public static void main(String[] args) throws Exception {
-        // Configure SSL.
-        final SslContext sslCtx;
-        if (SSL) {
-            sslCtx = SslContextBuilder.forClient()
-                .trustManager(InsecureTrustManagerFactory.INSTANCE).build();
-        } else {
-            sslCtx = null;
-        }
-
         EventLoopGroup group = new NioEventLoopGroup();
         try {
             Bootstrap b = new Bootstrap();
@@ -61,11 +51,8 @@ public final class MemcacheClient {
                         @Override
                         protected void initChannel(SocketChannel ch) throws Exception {
                             ChannelPipeline p = ch.pipeline();
-                            if (sslCtx != null) {
-                                p.addLast(sslCtx.newHandler(ch.alloc(), HOST, PORT));
-                            }
                             p.addLast(new BinaryMemcacheClientCodec());
-                            p.addLast(new BinaryMemcacheObjectAggregator(Integer.MAX_VALUE));
+                            p.addLast(new BinaryMemcacheObjectAggregator(Integer.MAX_VALUE)); //进来的时候进行的聚合
                             p.addLast(new MemcacheClientHandler());
                         }
                     });

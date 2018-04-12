@@ -33,14 +33,11 @@ public class FileClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        ByteBuf path = ctx.alloc().buffer(filename.length());
-        path.writeBytes(filename.getBytes());
         ctx.writeAndFlush(filename);
     }
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) throws Exception {
-
         ByteBuf buf = msg.retainedDuplicate();
         byte[] code = new byte[buf.readableBytes()];
         buf.readBytes(code);
