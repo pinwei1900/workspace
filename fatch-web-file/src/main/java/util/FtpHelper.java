@@ -8,6 +8,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.apache.commons.net.ftp.FTPClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This program demonstrates how to download a file from FTP server using FTP URL.
@@ -15,6 +17,8 @@ import org.apache.commons.net.ftp.FTPClient;
  * @author haosonglin
  */
 public class FtpHelper {
+
+    private static final Logger logger = LoggerFactory.getLogger(FtpHelper.class);
 
     private static String PATH_Prefix;
 
@@ -53,6 +57,7 @@ public class FtpHelper {
 
             return isSucc;
         } catch (Exception e) {
+            logger.error("download error :" + downFile.getName() , e);
             return false;
         } finally {
             if (client != null) {
@@ -75,15 +80,7 @@ public class FtpHelper {
         }
     }
 
-    public static String getSavePath(String ftpUrl) {
-        return PATH_Prefix + getPathSuffix(ftpUrl);
-    }
-
     public static String getPathSuffix(String ftpUrl) {
         return ftpUrl.substring(ftpUrl.lastIndexOf("/") + 1);
-    }
-
-    public void close() throws IOException {
-
     }
 }

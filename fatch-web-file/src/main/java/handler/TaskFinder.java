@@ -8,9 +8,7 @@ import bean.DownFile;
 import db.SqlHelper;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Properties;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,12 +28,6 @@ public class TaskFinder extends Thread {
         helper = new SqlHelper();
     }
 
-//    private final Properties properties;
-//
-//    public TaskFinder(Properties p) {
-//        this.properties = p;
-//    }
-
     @Override
     public void run() {
         try {
@@ -45,7 +37,7 @@ public class TaskFinder extends Thread {
         }
     }
 
-    private void executor() throws SQLException, ClassNotFoundException {
+    private synchronized static List<DownFile> getUnDownloadRecord() throws SQLException, ClassNotFoundException {
         List<DownFile> files = helper
                 .executeQuery("SELECT * FROM fatch_down_file WHERE success = 0",
                         (rs, index) -> {
@@ -56,6 +48,22 @@ public class TaskFinder extends Thread {
                             int success = rs.getInt(5);
                             return new DownFile(id, host, name, path, success);
                         });
+        return files;
+    }
+
+    public static boolean checkFinished(){
+        try {
+            return getUnDownloadRecord().size() == 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    private void executor() throws SQLException, ClassNotFoundException {
+        List<DownFile> files = getUnDownloadRecord();
 
         if (files.size() == 0) {
             return;
@@ -73,8 +81,8 @@ public class TaskFinder extends Thread {
 
     }
 
-    public static DownFile getTask() throws InterruptedException {
-        return waitFile.take();
+    public static DownFile getTask() {
+        return waitFile.poll();
     }
 
 

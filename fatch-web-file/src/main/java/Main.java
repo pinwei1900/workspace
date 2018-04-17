@@ -27,7 +27,7 @@ public class Main {
         Properties p = new Properties();
         p.load(in);
 
-        TaskManager.initDb(p.getProperty("downloadSummary"));
+        TaskManager.initDb(p.getProperty("PATH_Prefix") ,p.getProperty("downloadSummary"));
 
         TaskFinder finder = new TaskFinder();
         finder.start();

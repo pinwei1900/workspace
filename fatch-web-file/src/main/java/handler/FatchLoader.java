@@ -41,19 +41,25 @@ public class FatchLoader extends Thread {
     public void run() {
         ExecutorService cachedThreadPool = Executors.newFixedThreadPool(threadNumber);
         while (true) {
-            DownFile task;
             try {
-                task = TaskFinder.getTask();
+                DownFile task = TaskFinder.getTask();
+                if (task == null) {
+                    if (TaskFinder.checkFinished()) {
+                        break;
+                    }
+                    Thread.sleep(500);
+                    continue;
+                }
                 cachedThreadPool.execute(new TaskRunner(task));
-            } catch (InterruptedException e) {
-                logger.error("get task error", e);
+            } catch (Exception e) {
                 try {
                     Thread.sleep(500);
                 } catch (InterruptedException e1) {
-                    e.printStackTrace();
+                    e1.printStackTrace();
                 }
             }
         }
+        cachedThreadPool.shutdown();
     }
 
     class TaskRunner implements Runnable {
@@ -68,9 +74,8 @@ public class FatchLoader extends Thread {
         public void run() {
             try {
                 boolean success = ftpHelper.download(task);
-                SqlHelper sqlHelper = new SqlHelper();
                 if (success) {
-                    sqlHelper.executeUpdate(
+                    new SqlHelper().executeUpdate(
                             "UPDATE fatch_down_file SET success = 1 WHERE id = " + task
                                     .getId() + ";");
                     logger.info("task : {} download over , name = {}", task.getId(),

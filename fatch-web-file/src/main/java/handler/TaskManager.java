@@ -9,16 +9,13 @@ import static config.constant.dbsql;
 
 import db.SqlHelper;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Files;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 import util.FtpHelper;
 
 /**
@@ -52,7 +49,7 @@ public class TaskManager {
         return filePaths;
     }
 
-    public static void initDb(String downloadSummary) {
+    public static void initDb(String path_prefix, String downloadSummary) {
         try {
             List<String> files = getAllfilepath(downloadSummary);
             List<String> execList = new ArrayList<>();
@@ -62,24 +59,15 @@ public class TaskManager {
                 String host = url.getHost();
                 String name = FtpHelper.getPathSuffix(path);
                 int success = 0;
-                if (checkFileExist(path)) {
-                    success = 1;
+                if (!new File(path_prefix + name).exists()) {
+                    execList.add(
+                            "INSERT INTO fatch_down_file (host, name, path, success) VALUES ('" + host
+                                    + "','" + name + "','" + url.getFile() + "'," + success + ");");
                 }
-                execList.add(
-                        "INSERT INTO fatch_down_file (host, name, path, success) VALUES ('" + host
-                                + "','" + name + "','" + url.getFile() + "'," + success + ");");
             }
             sqlHelper.executeUpdate(execList);
         } catch (SQLException | ClassNotFoundException | IOException e) {
             e.printStackTrace();
         }
-    }
-
-    private static boolean checkFileExist(String link) {
-        return new File(FtpHelper.getSavePath(link)).exists();
-    }
-
-    public static void main(String[] args) {
-
     }
 }
