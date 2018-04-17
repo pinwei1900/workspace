@@ -6,7 +6,12 @@ package handler;
 
 import bean.DownFile;
 import db.SqlHelper;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.slf4j.Logger;
@@ -20,15 +25,23 @@ import util.FtpHelper;
  * @Version 1.0.0
  */
 public class FatchLoader extends Thread {
-
     private static final Logger logger = LoggerFactory.getLogger(FatchLoader.class);
-    FtpHelper ftpHelper = new FtpHelper();
+    private final int threadNumber;
+
+    private String path;
+    private FtpHelper ftpHelper;
+
+    public FatchLoader(String savepath ,int thread_number ) throws IOException {
+        this.path = savepath;
+        this.threadNumber = thread_number;
+        this.ftpHelper = new FtpHelper(path);
+    }
 
     @Override
     public void run() {
-        ExecutorService cachedThreadPool = Executors.newFixedThreadPool(4);
+        ExecutorService cachedThreadPool = Executors.newFixedThreadPool(threadNumber);
         while (true) {
-            DownFile task = null;
+            DownFile task;
             try {
                 task = TaskFinder.getTask();
                 cachedThreadPool.execute(new TaskRunner(task));

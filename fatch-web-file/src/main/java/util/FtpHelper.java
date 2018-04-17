@@ -1,8 +1,5 @@
 package util;
 
-import static config.constant.PATH_Prefix;
-import static config.constant.host;
-
 import bean.DownFile;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -19,6 +16,11 @@ import org.apache.commons.net.ftp.FTPClient;
  */
 public class FtpHelper {
 
+    private static String PATH_Prefix;
+
+    public FtpHelper(String path) {
+        this.PATH_Prefix = path;
+    }
 
     public boolean download(DownFile downFile) {
         boolean isSucc;
@@ -33,7 +35,7 @@ public class FtpHelper {
                 temfile.delete();
             }
 
-            client.connect(host);
+            client.connect(downFile.getHost());
             client.enterLocalPassiveMode();
             client.login("anonymous", "");
             outputStream = new FileOutputStream(temppath);

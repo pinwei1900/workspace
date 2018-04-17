@@ -27,10 +27,6 @@ public class constant {
             + ";\n"
             + "\n";
 
-    public static final String PATH_Prefix = "E:/Download/";
-
-    public static final String host = "ftp.ncbi.nlm.nih.gov";
-    public static final String downloadSummary = "download_assembly_summary.txt";
     public static final String dbFilePath = "fatch_web_file.db";
 
 

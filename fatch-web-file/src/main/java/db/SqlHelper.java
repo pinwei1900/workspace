@@ -2,7 +2,6 @@ package db;
 
 import static config.constant.dbFilePath;
 
-import bean.DownFile;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -10,7 +9,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,10 +19,6 @@ public class SqlHelper {
     private Connection connection;
     private Statement statement;
     private ResultSet resultSet;
-
-    public SqlHelper() {
-
-    }
 
     public Connection getConnection(String dbFilePath) throws ClassNotFoundException, SQLException {
         Connection conn = DriverManager.getConnection("jdbc:sqlite:" + dbFilePath);

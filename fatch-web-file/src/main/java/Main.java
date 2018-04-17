@@ -5,8 +5,12 @@
 
 import handler.FatchLoader;
 import handler.TaskFinder;
+import handler.TaskManager;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.Properties;
 
 /**
  * @Description
@@ -18,10 +22,17 @@ public class Main {
 
     public static void main(String[] args)
             throws SQLException, ClassNotFoundException, IOException, InterruptedException {
+
+        InputStream in = new FileInputStream("src/main/resources/config.properties");
+        Properties p = new Properties();
+        p.load(in);
+
+        TaskManager.initDb(p.getProperty("downloadSummary"));
+
         TaskFinder finder = new TaskFinder();
         finder.start();
 
-        FatchLoader loader = new FatchLoader();
+        FatchLoader loader = new FatchLoader(p.getProperty("PATH_Prefix"),Integer.valueOf(p.getProperty("thread_number")));
         loader.start();
     }
 }

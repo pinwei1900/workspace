@@ -6,17 +6,19 @@ package handler;
 
 import static config.constant.dbFilePath;
 import static config.constant.dbsql;
-import static config.constant.downloadSummary;
 
 import db.SqlHelper;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Files;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import util.FtpHelper;
 
 /**
@@ -44,16 +46,15 @@ public class TaskManager {
         }
     }
 
-
-    private static List<String> initDb(String path) throws IOException {
+    private static List<String> getAllfilepath(String path) throws IOException {
         List<String> filePaths = new ArrayList<>();
         Files.lines(new File(path).toPath()).map(String::trim).forEach(filePaths::add);
         return filePaths;
     }
 
-    private static void initDb() {
+    public static void initDb(String downloadSummary) {
         try {
-            List<String> files = initDb(downloadSummary);
+            List<String> files = getAllfilepath(downloadSummary);
             List<String> execList = new ArrayList<>();
 
             for (String path : files) {
@@ -79,6 +80,6 @@ public class TaskManager {
     }
 
     public static void main(String[] args) {
-        initDb();
+
     }
 }

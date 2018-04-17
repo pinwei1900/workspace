@@ -8,6 +8,7 @@ import bean.DownFile;
 import db.SqlHelper;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
@@ -25,11 +26,15 @@ public class TaskFinder extends Thread {
 
     private static ArrayBlockingQueue<DownFile> waitFile = new ArrayBlockingQueue<DownFile>(10000);
     private static SqlHelper helper;
-    private static AtomicBoolean isAllDownLoad = new AtomicBoolean(false);
-
     static {
         helper = new SqlHelper();
     }
+
+//    private final Properties properties;
+//
+//    public TaskFinder(Properties p) {
+//        this.properties = p;
+//    }
 
     @Override
     public void run() {
@@ -53,7 +58,6 @@ public class TaskFinder extends Thread {
                         });
 
         if (files.size() == 0) {
-            isAllDownLoad.compareAndSet(false, true);
             return;
         }
 
@@ -67,10 +71,6 @@ public class TaskFinder extends Thread {
             logger.error("put file to ArrayBlockingQueue error", e);
         }
 
-    }
-
-    public static boolean ifAlldone() {
-        return isAllDownLoad.get();
     }
 
     public static DownFile getTask() throws InterruptedException {
