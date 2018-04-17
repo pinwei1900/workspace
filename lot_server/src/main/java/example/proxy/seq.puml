@@ -1,0 +1,7 @@
+@startuml
+HexDumpClient -> HexDumpProxy: hei,how are you
+HexDumpProxy --> TargetServer: hei,how are you
+
+TargetServer -> HexDumpProxy: hei,how are you
+HexDumpProxy <-- HexDumpClient: hei,how are you
+@enduml

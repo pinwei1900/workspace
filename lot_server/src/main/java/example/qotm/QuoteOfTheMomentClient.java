@@ -56,6 +56,9 @@ public final class QuoteOfTheMomentClient {
             // QuoteOfTheMomentClientHandler will close the DatagramChannel when a
             // response is received.  If the channel is not closed within 5 seconds,
             // print an error message and quit.
+
+            ch.closeFuture().sync();
+
             if (!ch.closeFuture().await(5000)) {
                 System.err.println("QOTM request timed out.");
             }

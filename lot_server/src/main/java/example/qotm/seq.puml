@@ -1,0 +1,4 @@
+@startuml
+QuoteOfTheMomentClient -> QuoteOfTheMomentServer: QOTM?
+QuoteOfTheMomentServer --> QuoteOfTheMomentClient: random quote
+@enduml

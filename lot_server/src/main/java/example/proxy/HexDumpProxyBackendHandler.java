@@ -15,6 +15,7 @@
  */
 package example.proxy;
 
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -36,11 +37,18 @@ public class HexDumpProxyBackendHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(final ChannelHandlerContext ctx, Object msg) {
+
+
+        ByteBuf buf = (ByteBuf) msg;
+        byte[] arr = new byte[buf.readableBytes()];
+        buf.duplicate().readBytes(arr);
+        System.out.println(new String(arr));
+
         inboundChannel.writeAndFlush(msg).addListener(new ChannelFutureListener() {
             @Override
             public void operationComplete(ChannelFuture future) {
                 if (future.isSuccess()) {
-                    ctx.channel().read();
+                    ctx.channel().read();//也是设置为自动读
                 } else {
                     future.channel().close();
                 }
