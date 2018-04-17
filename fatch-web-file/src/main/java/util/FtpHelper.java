@@ -1,10 +1,15 @@
 package util;
 
+import static config.constant.PATH_Prefix;
+import static config.constant.host;
+
+import bean.DownFile;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.SocketException;
-import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import org.apache.commons.net.ftp.FTPClient;
 
 /**
@@ -14,53 +19,69 @@ import org.apache.commons.net.ftp.FTPClient;
  */
 public class FtpHelper {
 
-    private static final int BUFFER_SIZE = 4096;
-    private static final String PATH_Prefix = "E:/Download/";
 
-    private final String host;
-    private FTPClient client;
+    public boolean download(DownFile downFile) {
+        boolean isSucc;
+        FileOutputStream outputStream = null;
+        FTPClient client = new FTPClient();
+        String savepath = PATH_Prefix + downFile.getName();
+        String temppath = PATH_Prefix + downFile.getName() + "_tmp";
+        File temfile = new File(temppath);
 
-    public FtpHelper(String host) {
-        this.host = host;
-    }
+        try {
+            if (temfile.exists()) {
+                temfile.delete();
+            }
 
-    public boolean download(String ftpUrl) throws IOException {
+            client.connect(host);
+            client.enterLocalPassiveMode();
+            client.login("anonymous", "");
+            outputStream = new FileOutputStream(temppath);
+            isSucc = client.retrieveFile(downFile.getPath(), outputStream);
 
-        if (client == null) {
-            synchronized (client) {
-                if (client == null) {
-                    client = new FTPClient();
+            outputStream.close();
+            outputStream = null;
+            client.disconnect();
+            client = null;
+
+            if (isSucc) {
+                Path source = Paths.get(temppath);
+                Files.move(source, source.resolveSibling(savepath));
+            }
+
+            return isSucc;
+        } catch (Exception e) {
+            return false;
+        } finally {
+            if (client != null) {
+                try {
+                    client.disconnect();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (temfile.exists()) {
+                temfile.delete();
+            }
+            if (outputStream != null) {
+                try {
+                    outputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
         }
-
-        URL l = null;
-        FileOutputStream outputStream = null;
-        try {
-            l = new URL(ftpUrl);
-            client.connect(l.getHost());
-            client.enterLocalPassiveMode();
-            client.login("anonymous", "");
-
-            outputStream = new FileOutputStream(getSavePath(ftpUrl));
-        } catch (Exception e) {
-            return false;
-        }
-
-        boolean isSucc =  client.retrieveFile(l.getFile(), outputStream);
-        outputStream.close();
-        return isSucc;
     }
 
-    public void close() throws IOException {
-        client.disconnect();
+    public static String getSavePath(String ftpUrl) {
+        return PATH_Prefix + getPathSuffix(ftpUrl);
     }
 
-    public String getPathSuffix(String ftpUrl) {
+    public static String getPathSuffix(String ftpUrl) {
         return ftpUrl.substring(ftpUrl.lastIndexOf("/") + 1);
     }
 
-    public String getSavePath(String ftpUrl) {
-        return PATH_Prefix + getPathSuffix(ftpUrl);
+    public void close() throws IOException {
+
     }
 }
