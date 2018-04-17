@@ -17,6 +17,26 @@
           <target>1.8</target>
         </configuration>
       </plugin>
+
+      <!-- commandline: mvn exec:java -Dexec.mainClass="org.phpfirefly.test.Server" -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>1.1</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>java</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <mainClass>Main</mainClass>
+        </configuration>
+      </plugin>
+
+
     </plugins>
   </build>
 
