@@ -21,6 +21,9 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.ReferenceCountUtil;
 
+/**
+ * 这个handler处理的事情在于，使用这个装配之后，可以实现channel中的write写传递，一直到末端
+ */
 public final class RelayHandler extends ChannelInboundHandlerAdapter {
 
     private final Channel relayChannel;

@@ -15,13 +15,21 @@
  */
 package example.discard;
 
+import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
 /**
  * Handles a server-side channel.
  */
+@Sharable
 public class DiscardServerHandler extends SimpleChannelInboundHandler<Object> {
+
+
+    @Override
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        System.out.println("建立连接" + this); //对了
+    }
 
     @Override
     public void channelRead0(ChannelHandlerContext ctx, Object msg) throws Exception {

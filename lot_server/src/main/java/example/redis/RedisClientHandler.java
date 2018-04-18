@@ -38,6 +38,9 @@ import java.util.List;
  */
 public class RedisClientHandler extends ChannelDuplexHandler {
 
+    /**
+     * 从channel 写数据到pipeline
+     */
     @Override
     public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) {
         String[] commands = ((String) msg).split("\\s+");
@@ -49,6 +52,9 @@ public class RedisClientHandler extends ChannelDuplexHandler {
         ctx.write(request, promise);
     }
 
+    /**
+     * 从pipeline读取数据，显示输出然后释放buffer
+     */
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         RedisMessage redisMessage = (RedisMessage) msg;
@@ -63,6 +69,9 @@ public class RedisClientHandler extends ChannelDuplexHandler {
         ctx.close();
     }
 
+    /**
+     * 对msg进行响应，不同的msg可以有不同的输出显示
+     */
     private static void printAggregatedRedisResponse(RedisMessage msg) {
         if (msg instanceof SimpleStringRedisMessage) {
             System.out.println(((SimpleStringRedisMessage) msg).content());

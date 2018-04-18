@@ -39,6 +39,8 @@ public final class DiscardServer {
     public static void main(String[] args) throws Exception {
         EventLoopGroup bossGroup = new NioEventLoopGroup(1);
         EventLoopGroup workerGroup = new NioEventLoopGroup();
+
+        DiscardServerHandler a = new DiscardServerHandler();
         try {
             ServerBootstrap b = new ServerBootstrap();
             b.group(bossGroup, workerGroup)
@@ -48,7 +50,7 @@ public final class DiscardServer {
                  @Override
                  public void initChannel(SocketChannel ch) {
                      ChannelPipeline p = ch.pipeline();
-                     p.addLast(new DiscardServerHandler());
+                     p.addLast(a);
                  }
              });
 

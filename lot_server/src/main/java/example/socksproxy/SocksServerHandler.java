@@ -34,10 +34,14 @@ import io.netty.handler.codec.socksx.v5.Socks5PasswordAuthStatus;
 @ChannelHandler.Sharable
 public final class SocksServerHandler extends SimpleChannelInboundHandler<SocksMessage> {
 
+    //sharable的正确使用方式
     public static final SocksServerHandler INSTANCE = new SocksServerHandler();
 
     private SocksServerHandler() { }
 
+    /**
+     * 根据不同的socket版本添加不同的handler进行处理
+     */
     @Override
     public void channelRead0(ChannelHandlerContext ctx, SocksMessage socksRequest) throws Exception {
         switch (socksRequest.version()) {

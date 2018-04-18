@@ -34,6 +34,9 @@ public class SecureChatServerHandler extends SimpleChannelInboundHandler<String>
 
     static final ChannelGroup channels = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 
+    /**
+     * 在每一次channel可以使用的时候执行此方法
+     */
     @Override
     public void channelActive(final ChannelHandlerContext ctx) {
         // Once session is secured, send a greeting and register the channel to the global channel
@@ -43,7 +46,7 @@ public class SecureChatServerHandler extends SimpleChannelInboundHandler<String>
                     @Override
                     public void operationComplete(Future<Channel> future) throws Exception {
                         ctx.writeAndFlush(
-                                "Welcome to " + InetAddress.getLocalHost().getHostName() + " secure chat service!\n");
+                                "Welcome to " + InetAddress.getLocalHost().getHostName() + " secure chat service!\n"); //从当前handler直接发送到对端
                         ctx.writeAndFlush(
                                 "Your session is protected by " +
                                         ctx.pipeline().get(SslHandler.class).engine().getSession().getCipherSuite() +
@@ -57,7 +60,7 @@ public class SecureChatServerHandler extends SimpleChannelInboundHandler<String>
     @Override
     public void channelRead0(ChannelHandlerContext ctx, String msg) throws Exception {
         // Send the received message to all channels but the current one.
-        for (Channel c: channels) {
+        for (Channel c: channels) { //对保存的所有channel，都有一个连接保存
             if (c != ctx.channel()) {
                 c.writeAndFlush("[" + ctx.channel().remoteAddress() + "] " + msg + '\n');
             } else {

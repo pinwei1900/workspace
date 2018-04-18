@@ -15,11 +15,17 @@
  */
 package example.spdy.client;
 
+import static io.netty.handler.codec.spdy.SpdyVersion.SPDY_3_1;
+import static io.netty.util.internal.logging.InternalLogLevel.INFO;
+
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
+import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.http.DefaultFullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaderNames;
@@ -27,6 +33,10 @@ import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpVersion;
+import io.netty.handler.codec.spdy.SpdyFrameCodec;
+import io.netty.handler.codec.spdy.SpdyHttpDecoder;
+import io.netty.handler.codec.spdy.SpdyHttpEncoder;
+import io.netty.handler.codec.spdy.SpdySessionHandler;
 import io.netty.handler.ssl.ApplicationProtocolConfig;
 import io.netty.handler.ssl.ApplicationProtocolConfig.Protocol;
 import io.netty.handler.ssl.ApplicationProtocolConfig.SelectedListenerFailureBehavior;
@@ -54,6 +64,8 @@ public final class SpdyClient {
     static final String HOST = System.getProperty("host", "127.0.0.1");
     static final int PORT = Integer.parseInt(System.getProperty("port", "8443"));
 
+    private static final int MAX_SPDY_CONTENT_LENGTH = 1024 * 1024; // 1 MB
+
     public static void main(String[] args) throws Exception {
         // Configure SSL.
         final SslContext sslCtx = SslContextBuilder.forClient()
@@ -77,7 +89,20 @@ public final class SpdyClient {
             b.channel(NioSocketChannel.class);
             b.option(ChannelOption.SO_KEEPALIVE, true);
             b.remoteAddress(HOST, PORT);
-            b.handler(new SpdyClientInitializer(sslCtx, httpResponseHandler));
+            b.handler(new ChannelInitializer<SocketChannel>() {
+                @Override
+                protected void initChannel(SocketChannel ch) throws Exception {
+                    ChannelPipeline pipeline = ch.pipeline();
+                    pipeline.addLast("ssl", sslCtx.newHandler(ch.alloc()));
+                    pipeline.addLast("spdyFrameCodec", new SpdyFrameCodec(SPDY_3_1));
+                    pipeline.addLast("spdyFrameLogger", new SpdyFrameLogger(INFO));
+                    pipeline.addLast("spdySessionHandler", new SpdySessionHandler(SPDY_3_1, false));
+                    pipeline.addLast("spdyHttpEncoder", new SpdyHttpEncoder(SPDY_3_1));
+                    pipeline.addLast("spdyHttpDecoder", new SpdyHttpDecoder(SPDY_3_1, MAX_SPDY_CONTENT_LENGTH));
+                    pipeline.addLast("spdyStreamIdHandler", new SpdyClientStreamIdHandler());
+                    pipeline.addLast("httpHandler", httpResponseHandler);
+                }
+            });
 
             // Start the client.
             Channel channel = b.connect().syncUninterruptibly().channel();

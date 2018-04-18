@@ -20,6 +20,9 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.concurrent.Promise;
 
+/**
+ * 直接与互联网进行通信的Handler，所以在从互联网传递过来信息之后，会激活promise，组装channel
+ */
 public final class DirectClientHandler extends ChannelInboundHandlerAdapter {
 
     private final Promise<Channel> promise;

@@ -64,6 +64,8 @@ public class RedisClient {
             // Read commands from the stdin.
             System.out.println("Enter Redis commands (quit to end)");
             ChannelFuture lastWriteFuture = null;
+
+            // 获取控制台输入，这里的输入需要仔细的查看清楚，输入的地方需要被等待，输入的地方直接输出就结束了
             BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
             for (;;) {
                 final String input = in.readLine();

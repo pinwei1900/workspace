@@ -8,6 +8,7 @@ import bean.DownFile;
 import db.SqlHelper;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.slf4j.Logger;
@@ -75,8 +76,8 @@ public class FatchLoader extends Thread {
                             "UPDATE fatch_down_file SET success = 1 WHERE id = " + task
                                     .getId() + ";");
 
-                    logger.info("task : {} download over , name = {} , progress：{}", task.getId(),
-                            task.getName(),TaskManager.updateAndProgress());
+                    logger.info("task : {} download over , name = {} , progress：{} , time = {}", task.getId(),
+                            task.getName(),TaskManager.updateAndProgress(),new Date());
                 } else {
                     TaskFinder.addTask(task);
                 }
