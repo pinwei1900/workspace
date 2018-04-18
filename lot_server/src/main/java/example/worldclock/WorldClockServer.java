@@ -16,9 +16,16 @@
 package example.worldclock;
 
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.protobuf.ProtobufDecoder;
+import io.netty.handler.codec.protobuf.ProtobufEncoder;
+import io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
+import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.ssl.SslContext;
@@ -51,7 +58,23 @@ public final class WorldClockServer {
             b.group(bossGroup, workerGroup)
              .channel(NioServerSocketChannel.class)
              .handler(new LoggingHandler(LogLevel.INFO))
-             .childHandler(new WorldClockServerInitializer(sslCtx));
+             .childHandler(new ChannelInitializer<SocketChannel>() {
+                 @Override
+                 protected void initChannel(SocketChannel ch) throws Exception {
+                     ChannelPipeline p = ch.pipeline();
+                     if (sslCtx != null) {
+                         p.addLast(sslCtx.newHandler(ch.alloc()));
+                     }
+
+                     p.addLast(new ProtobufVarint32FrameDecoder());
+                     p.addLast(new ProtobufDecoder(WorldClockProtocol.Locations.getDefaultInstance()));
+
+                     p.addLast(new ProtobufVarint32LengthFieldPrepender());
+                     p.addLast(new ProtobufEncoder());
+
+                     p.addLast(new WorldClockServerHandler());
+                 }
+             });
 
             b.bind(PORT).sync().channel().closeFuture().sync();
         } finally {
