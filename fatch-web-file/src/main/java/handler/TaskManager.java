@@ -16,6 +16,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import util.FtpHelper;
 
 /**
@@ -27,6 +28,10 @@ import util.FtpHelper;
 public class TaskManager {
 
     static SqlHelper sqlHelper;
+
+    public static AtomicInteger totol = new AtomicInteger(0);
+
+    public static AtomicInteger rate = new AtomicInteger(0);
 
     static {
         try {
@@ -59,15 +64,22 @@ public class TaskManager {
                 String host = url.getHost();
                 String name = FtpHelper.getPathSuffix(path);
                 int success = 0;
-                if (!new File(path_prefix + name).exists()) {
-                    execList.add(
-                            "INSERT INTO fatch_down_file (host, name, path, success) VALUES ('" + host
-                                    + "','" + name + "','" + url.getFile() + "'," + success + ");");
+                if (new File(path_prefix + name).exists()) {
+                    success = 1;
+                    rate.incrementAndGet();
                 }
+                execList.add(
+                        "INSERT INTO fatch_down_file (host, name, path, success) VALUES ('" + host
+                                + "','" + name + "','" + url.getFile() + "'," + success + ");");
             }
             sqlHelper.executeUpdate(execList);
+            totol.compareAndSet(0, execList.size());
         } catch (SQLException | ClassNotFoundException | IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static String updateAndProgress() {
+        return rate.incrementAndGet() + ":" + totol;
     }
 }

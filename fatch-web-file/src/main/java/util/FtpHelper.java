@@ -57,7 +57,7 @@ public class FtpHelper {
 
             return isSucc;
         } catch (Exception e) {
-            logger.error("download error :" + downFile.getName() , e);
+            logger.error("download error :" + downFile.getName());
             return false;
         } finally {
             if (client != null) {
