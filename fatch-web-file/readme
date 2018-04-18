@@ -12,3 +12,6 @@ ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/007/365/GCF_000007365.1_ASM736v1/
 
 执行需要安装java以及maven
 sudo apt-get install maven
+
+
+测试环境是否OK ,命令行分别输入 java , javac , mvn 都有显示
