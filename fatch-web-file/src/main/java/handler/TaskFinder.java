@@ -8,7 +8,7 @@ import bean.DownFile;
 import db.SqlHelper;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,8 +22,10 @@ public class TaskFinder extends Thread {
 
     private static final Logger logger = LoggerFactory.getLogger(TaskFinder.class);
 
-    private static ArrayBlockingQueue<DownFile> waitFile = new ArrayBlockingQueue<DownFile>(10000);
+    private static LinkedBlockingQueue<DownFile> waitFile = new LinkedBlockingQueue<>();
+
     private static SqlHelper helper;
+
     static {
         helper = new SqlHelper();
     }
@@ -37,26 +39,23 @@ public class TaskFinder extends Thread {
         }
     }
 
-    private synchronized static List<DownFile> getUnDownloadRecord() throws SQLException, ClassNotFoundException {
-        List<DownFile> files = helper
-                .executeQuery("SELECT * FROM fatch_down_file WHERE success = 0",
-                        (rs, index) -> {
-                            int id = rs.getInt(1);
-                            String host = rs.getString(2);
-                            String name = rs.getString(3);
-                            String path = rs.getString(4);
-                            int success = rs.getInt(5);
-                            return new DownFile(id, host, name, path, success);
-                        });
-        return files;
+    private synchronized static List<DownFile> getUnDownloadRecord()
+            throws SQLException, ClassNotFoundException {
+        return helper.executeQuery("SELECT * FROM fatch_down_file WHERE success = 0",
+                (rs, index) -> {
+                    int id = rs.getInt(1);
+                    String host = rs.getString(2);
+                    String name = rs.getString(3);
+                    String path = rs.getString(4);
+                    int success = rs.getInt(5);
+                    return new DownFile(id, host, name, path, success);
+                });
     }
 
-    public static boolean checkFinished(){
+    static boolean checkFinished() {
         try {
             return getUnDownloadRecord().size() == 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
+        } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
         }
         return false;
@@ -71,22 +70,21 @@ public class TaskFinder extends Thread {
 
         try {
             for (DownFile file : files) {
-                if (file.getSuccess() == 0) {
-                    waitFile.put(file);
-                }
+                waitFile.put(file);
             }
+            System.out.println("共有文件" + TaskManager.getTotol() + "，已经下载 " + TaskManager.getRate() + ", 还需要下载文件：" + waitFile.size() + "个");
         } catch (InterruptedException e) {
             logger.error("put file to ArrayBlockingQueue error", e);
         }
 
     }
 
-    public static DownFile getTask() {
+    static DownFile getTask() {
         return waitFile.poll();
     }
 
 
-    public static void addTask(DownFile failedTask) throws InterruptedException {
+    static void addTask(DownFile failedTask) throws InterruptedException {
         waitFile.put(failedTask);
     }
 }

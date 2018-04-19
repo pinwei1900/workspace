@@ -27,11 +27,11 @@ import util.FtpHelper;
  */
 public class TaskManager {
 
-    static SqlHelper sqlHelper;
+    private static SqlHelper sqlHelper;
 
-    public static AtomicInteger totol = new AtomicInteger(0);
+    private static AtomicInteger totol = new AtomicInteger(0);
 
-    public static AtomicInteger rate = new AtomicInteger(0);
+    private static AtomicInteger rate = new AtomicInteger(0);
 
     static {
         try {
@@ -79,7 +79,15 @@ public class TaskManager {
         }
     }
 
-    public static String updateAndProgress() {
+    static String updateAndProgress() {
         return rate.incrementAndGet() + ":" + totol;
+    }
+
+    public static AtomicInteger getTotol() {
+        return totol;
+    }
+
+    public static AtomicInteger getRate() {
+        return rate;
     }
 }

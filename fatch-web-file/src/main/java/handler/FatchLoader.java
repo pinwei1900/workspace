@@ -25,13 +25,11 @@ public class FatchLoader extends Thread {
     private static final Logger logger = LoggerFactory.getLogger(FatchLoader.class);
     private final int threadNumber;
 
-    private String path;
     private FtpHelper ftpHelper;
 
     public FatchLoader(String savepath ,int thread_number ) throws IOException {
-        this.path = savepath;
         this.threadNumber = thread_number;
-        this.ftpHelper = new FtpHelper(path);
+        this.ftpHelper = new FtpHelper(savepath);
     }
 
     @Override
@@ -63,7 +61,7 @@ public class FatchLoader extends Thread {
 
         private final DownFile task;
 
-        public TaskRunner(DownFile task) {
+        TaskRunner(DownFile task) {
             this.task = task;
         }
 
