@@ -1,0 +1,15 @@
+/target/
+.mvn
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+/.mvn/
+/eureka_client_a/target/
+/eureka_server/target/
+/service-feign/target/
+/service-ribbon/target/
+mvnw.cmd
+mvnw
