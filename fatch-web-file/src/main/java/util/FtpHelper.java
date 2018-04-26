@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,19 +30,20 @@ public class FtpHelper {
     public boolean download(DownFile downFile) {
         boolean isSucc;
         FileOutputStream outputStream = null;
-        FTPClient client = new FTPClient();
+
         String savepath = PATH_Prefix + downFile.getName();
         String temppath = PATH_Prefix + downFile.getName() + "_tmp";
         File temfile = new File(temppath);
 
+        FTPClient client = new FTPClient();
         try {
             if (temfile.exists()) {
                 temfile.delete();
             }
-
             client.connect(downFile.getHost());
             client.enterLocalPassiveMode();
             client.login("anonymous", "");
+            client.setFileType(FTP.BINARY_FILE_TYPE);
             outputStream = new FileOutputStream(temppath);
             isSucc = client.retrieveFile(downFile.getPath(), outputStream);
 
@@ -57,7 +59,7 @@ public class FtpHelper {
 
             return isSucc;
         } catch (Exception e) {
-            logger.error("download error :" + downFile.getName());
+            logger.error("download error :" + downFile.getName(),e);
             return false;
         } finally {
             if (client != null) {
