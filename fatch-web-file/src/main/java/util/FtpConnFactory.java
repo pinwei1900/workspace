@@ -8,6 +8,8 @@ package util;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.pool.BasePoolableObjectFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @Description
@@ -17,6 +19,8 @@ import org.apache.commons.pool.BasePoolableObjectFactory;
  */
 public class FtpConnFactory extends BasePoolableObjectFactory<FTPClient> {
 
+    private static final Logger logger = LoggerFactory.getLogger(FtpHelper.class);
+
     @Override
     public FTPClient makeObject() throws Exception {
         FTPClient client = new FTPClient();
@@ -24,11 +28,14 @@ public class FtpConnFactory extends BasePoolableObjectFactory<FTPClient> {
         client.enterLocalPassiveMode();
         client.login("anonymous", "");
         client.setFileType(FTP.BINARY_FILE_TYPE);
+
+        logger.info("创建一个连接" + client);
         return client;
     }
 
     @Override
     public void destroyObject(FTPClient obj) throws Exception {
+        obj.disconnect();
         super.destroyObject(obj);
     }
 

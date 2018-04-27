@@ -9,7 +9,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.net.ftp.FTPClient;
-import org.apache.commons.pool.impl.SoftReferenceObjectPool;
+import org.apache.commons.pool.impl.GenericObjectPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,13 +24,12 @@ public class FtpHelper {
 
     private static String PATH_Prefix;
 
-    private final SoftReferenceObjectPool poll;
+    private final GenericObjectPool poll;
 
     public FtpHelper(String path) {
         this.PATH_Prefix = path;
-        this.poll = new SoftReferenceObjectPool(new FtpConnFactory());
+        this.poll = new GenericObjectPool(new FtpConnFactory() ,30);
     }
-
 
     //用来解压文件的方法，如果这个方法失败了，那么如果outfile还存在的话，需要删除这个文件，temfile无论成功与否都需要被删除，因为此文件解压失败，说明文件有问题
     private static void unCompressArchiveGz(File temfile, String  outPath) throws IOException {
@@ -57,8 +56,9 @@ public class FtpHelper {
         File temfile = new File(PATH_Prefix + downFile.getName() + "_tmp");
         delete(temfile);
 
+        FTPClient client = null;
         try (FileOutputStream outputStream = new FileOutputStream(temfile)) {
-            FTPClient client = (FTPClient) poll.borrowObject();
+            client = (FTPClient) poll.borrowObject();
             isSucc = client.retrieveFile(downFile.getPath(), outputStream);
             if (isSucc) {
                 outputStream.close();
@@ -67,6 +67,14 @@ public class FtpHelper {
             poll.returnObject(client);
             return isSucc;
         } catch (Exception e) {
+            if (client != null) {
+                try {
+                    logger.error("销毁一个连接，还有：" + poll.getNumActive() + "个连接");
+                    poll.invalidateObject(client);
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                }
+            }
             logger.error("download error :" + downFile.getName(), e);
             return false;
         } finally {

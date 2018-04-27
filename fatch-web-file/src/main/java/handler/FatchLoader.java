@@ -74,7 +74,8 @@ public class FatchLoader extends Thread {
                             "UPDATE fatch_down_file SET success = 1 WHERE id = " + task
                                     .getId() + ";");
 
-                    logger.info("task : {} download over , name = {} , progress：{} , time = {}", task.getId(),
+                    logger.info("task : {} download over , name = {} , progress：{} , time = {}",
+                            task.getId(),
                             task.getName(),TaskManager.updateAndProgress(),new Date());
                 } else {
                     TaskFinder.addTask(task);
