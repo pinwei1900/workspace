@@ -70,13 +70,15 @@ public class FatchLoader extends Thread {
             try {
                 boolean success = ftpHelper.download(task);
                 if (success) {
-//                    new SqlHelper().executeUpdate(
-//                            "UPDATE fatch_down_file SET success = 1 WHERE id = " + task
-//                                    .getId() + ";");
-
-                    logger.info("task : {} download over , name = {} , progress：{} , time = {}",
-                            task.getId(),
-                            task.getName(),TaskManager.updateAndProgress(),new Date());
+                    try {
+                        new SqlHelper().executeUpdate(
+                                "UPDATE fatch_down_file SET success = 1 WHERE id = " + task.getId() + ";");
+                        logger.info("task : {} download over , name = {} , progress：{} , time = {}",
+                                task.getId(), task.getName(),TaskManager.updateAndProgress(),new Date());
+                    } catch (SQLException | ClassNotFoundException e) {
+                        TaskFinder.addTask(task);
+                        logger.error("sql excepetion ,reput task into queue",e);
+                    }
                 } else {
                     TaskFinder.addTask(task);
                 }

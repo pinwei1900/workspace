@@ -28,6 +28,7 @@ public class constant {
             + "\n";
 
     public static final String dbFilePath = "fatch_web_file.db";
+    public static final String ftpHost = "ftp.ncbi.nlm.nih.gov";
 
 
 }

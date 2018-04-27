@@ -1,5 +1,7 @@
 package util;
 
+import static config.constant.ftpHost;
+
 import bean.DownFile;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -34,7 +36,7 @@ public class FtpHelper {
     //用来解压文件的方法，如果这个方法失败了，那么如果outfile还存在的话，需要删除这个文件，temfile无论成功与否都需要被删除，因为此文件解压失败，说明文件有问题
     private static void unCompressArchiveGz(File temfile, String  outPath) throws IOException {
         File outfile = new File(outPath);
-        //防止程序在被中断时没有即使删除文件
+        delete(outfile);
         try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(temfile));
                 BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(outfile));
                 GzipCompressorInputStream gcis = new GzipCompressorInputStream(bis)) {
@@ -59,6 +61,9 @@ public class FtpHelper {
         FTPClient client = null;
         try (FileOutputStream outputStream = new FileOutputStream(temfile)) {
             client = (FTPClient) poll.borrowObject();
+            if (!client.isConnected()) {
+                client.connect(ftpHost);
+            }
             isSucc = client.retrieveFile(downFile.getPath(), outputStream);
             if (isSucc) {
                 outputStream.close();
@@ -69,15 +74,14 @@ public class FtpHelper {
         } catch (Exception e) {
             if (client != null) {
                 try {
-                    logger.error("销毁一个连接，还有：" + poll.getNumActive() + "个连接");
                     poll.invalidateObject(client);
+                    logger.info("销毁一个连接，还有：" + poll.getNumActive() + "个连接");
                 } catch (Exception e1) {
                     e1.printStackTrace();
                 }
             }
             logger.error("download error :" + downFile.getName() + " url:" + downFile.getHost() +
-                            "/" + downFile.getPath(),
-                    e);
+                            "/" + downFile.getPath(), e);
             return false;
         } finally {
             delete(temfile);

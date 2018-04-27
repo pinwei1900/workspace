@@ -5,6 +5,8 @@
 package util;
 
 
+import static config.constant.ftpHost;
+
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.pool.BasePoolableObjectFactory;
@@ -24,7 +26,7 @@ public class FtpConnFactory extends BasePoolableObjectFactory<FTPClient> {
     @Override
     public FTPClient makeObject() throws Exception {
         FTPClient client = new FTPClient();
-        client.connect("ftp.ncbi.nlm.nih.gov");
+        client.connect(ftpHost);
         client.enterLocalPassiveMode();
         client.login("anonymous", "");
         client.setFileType(FTP.BINARY_FILE_TYPE);
