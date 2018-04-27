@@ -75,7 +75,9 @@ public class FtpHelper {
                     e1.printStackTrace();
                 }
             }
-            logger.error("download error :" + downFile.getName(), e);
+            logger.error("download error :" + downFile.getName() + " url:" + downFile.getHost() +
+                            "/" + downFile.getPath(),
+                    e);
             return false;
         } finally {
             delete(temfile);
