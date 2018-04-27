@@ -70,9 +70,9 @@ public class FatchLoader extends Thread {
             try {
                 boolean success = ftpHelper.download(task);
                 if (success) {
-                    new SqlHelper().executeUpdate(
-                            "UPDATE fatch_down_file SET success = 1 WHERE id = " + task
-                                    .getId() + ";");
+//                    new SqlHelper().executeUpdate(
+//                            "UPDATE fatch_down_file SET success = 1 WHERE id = " + task
+//                                    .getId() + ";");
 
                     logger.info("task : {} download over , name = {} , progress：{} , time = {}",
                             task.getId(),
@@ -80,12 +80,8 @@ public class FatchLoader extends Thread {
                 } else {
                     TaskFinder.addTask(task);
                 }
-            } catch (ClassNotFoundException e) {
-                logger.error("jdbc:sqlite no dound ");
             } catch (InterruptedException e) {
                 logger.error("add task failed ，", e);
-            } catch (SQLException e) {
-                logger.error("sql executor error ，", e);
             }
 
         }
