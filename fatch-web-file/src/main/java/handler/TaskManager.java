@@ -64,6 +64,11 @@ public class TaskManager {
                 String host = url.getHost();
                 String name = FtpHelper.getPathSuffix(path);
                 int success = 0;
+
+                if (new File(path_prefix + name + "_tmp").exists()) {
+                    new File(path_prefix + name + "_tmp").delete();
+                }
+
                 if (new File(path_prefix + name).exists()) {
                     success = 1;
                     rate.incrementAndGet();
