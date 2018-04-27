@@ -30,7 +30,9 @@ public class FtpHelper {
 
     public FtpHelper(String path) {
         this.PATH_Prefix = path;
-        this.poll = new GenericObjectPool(new FtpConnFactory() ,30);
+        this.poll = new GenericObjectPool(new FtpConnFactory(), 30);
+        this.poll.setMaxWait(2000);
+        this.poll.setLifo(false);
     }
 
     //用来解压文件的方法，如果这个方法失败了，那么如果outfile还存在的话，需要删除这个文件，temfile无论成功与否都需要被删除，因为此文件解压失败，说明文件有问题

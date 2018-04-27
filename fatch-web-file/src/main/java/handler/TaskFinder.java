@@ -53,12 +53,7 @@ public class TaskFinder extends Thread {
     }
 
     static boolean checkFinished() {
-        try {
-            return getUnDownloadRecord().size() == 0;
-        } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        return false;
+        return TaskManager.getRate().get() == TaskManager.getTotol().get();
     }
 
     private void executor() throws SQLException, ClassNotFoundException {

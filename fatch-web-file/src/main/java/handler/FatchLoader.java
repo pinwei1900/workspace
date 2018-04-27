@@ -5,9 +5,7 @@
 package handler;
 
 import bean.DownFile;
-import db.SqlHelper;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -22,12 +20,13 @@ import util.FtpHelper;
  * @Version 1.0.0
  */
 public class FatchLoader extends Thread {
+
     private static final Logger logger = LoggerFactory.getLogger(FatchLoader.class);
     private final int threadNumber;
 
     private FtpHelper ftpHelper;
 
-    public FatchLoader(String savepath ,int thread_number ) throws IOException {
+    public FatchLoader(String savepath, int thread_number) throws IOException {
         this.threadNumber = thread_number;
         this.ftpHelper = new FtpHelper(savepath);
     }
@@ -70,15 +69,9 @@ public class FatchLoader extends Thread {
             try {
                 boolean success = ftpHelper.download(task);
                 if (success) {
-                    try {
-                        new SqlHelper().executeUpdate(
-                                "UPDATE fatch_down_file SET success = 1 WHERE id = " + task.getId() + ";");
-                        logger.info("task : {} download over , name = {} , progress：{} , time = {}",
-                                task.getId(), task.getName(),TaskManager.updateAndProgress(),new Date());
-                    } catch (SQLException | ClassNotFoundException e) {
-                        TaskFinder.addTask(task);
-                        logger.error("sql excepetion ,reput task into queue",e);
-                    }
+                    String prosess = TaskManager.updateAndProgress();
+                    logger.info("task : {} download over , name = {} , progress：{} , time = {}",
+                            task.getId(), task.getName(), prosess, new Date());
                 } else {
                     TaskFinder.addTask(task);
                 }
