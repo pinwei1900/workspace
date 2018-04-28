@@ -56,12 +56,13 @@ public class TaskFinder {
 
 
 
-    static DownFile getTask() throws InterruptedException {
+    static synchronized DownFile getTask() throws InterruptedException {
         if (waitFile.size() == 0) {
             List<DownFile> files = getUnDownloadRecord(1000);
             for (DownFile file : files) {
                 waitFile.put(file);
             }
+            System.out.println(waitFile.size());
         }
         return waitFile.poll();
     }

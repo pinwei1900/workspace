@@ -11,6 +11,10 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.FtpHelper;
@@ -35,7 +39,16 @@ public class FatchLoader extends Thread {
 
     @Override
     public void run() {
-        ExecutorService cachedThreadPool = Executors.newFixedThreadPool(threadNumber);
+        ExecutorService cachedThreadPool = new ThreadPoolExecutor(threadNumber, threadNumber, 1, TimeUnit.DAYS,
+                new LinkedBlockingQueue<>(100), (r, executor) -> {
+                    if (!executor.isShutdown()) {
+                        try {
+                            executor.getQueue().put(r);
+                        } catch (InterruptedException e) {
+                            // should not be interrupted
+                        }
+                    }
+                });
         while (true) {
             try {
                 DownFile task = TaskFinder.getTask();
