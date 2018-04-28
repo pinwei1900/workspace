@@ -7,6 +7,7 @@ package handler;
 import bean.DownFile;
 import db.SqlHelper;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 import org.slf4j.Logger;
@@ -18,7 +19,7 @@ import org.slf4j.LoggerFactory;
  * @Date 2018/4/17
  * @Version 1.0.0
  */
-public class TaskFinder extends Thread {
+public class TaskFinder {
 
     private static final Logger logger = LoggerFactory.getLogger(TaskFinder.class);
 
@@ -30,51 +31,38 @@ public class TaskFinder extends Thread {
         helper = new SqlHelper();
     }
 
-    @Override
-    public void run() {
+    private synchronized static List<DownFile> getUnDownloadRecord(int limit) {
         try {
-            executor();
+            String sql = "SELECT * FROM fatch_down_file WHERE success = 0";
+            if (limit != 0) {
+                sql += " limit " + limit;
+            }
+
+            return helper.executeQuery(sql,
+                    (rs, index) -> {
+                        int id = rs.getInt(1);
+                        String host = rs.getString(2);
+                        String name = rs.getString(3);
+                        String path = rs.getString(4);
+                        int success = rs.getInt(5);
+                        return new DownFile(id, host, name, path, success);
+                    });
         } catch (SQLException | ClassNotFoundException e) {
+            logger.error("查看任务出错：");
             e.printStackTrace();
         }
+        return Collections.emptyList();
     }
 
-    private synchronized static List<DownFile> getUnDownloadRecord()
-            throws SQLException, ClassNotFoundException {
-        return helper.executeQuery("SELECT * FROM fatch_down_file WHERE success = 0",
-                (rs, index) -> {
-                    int id = rs.getInt(1);
-                    String host = rs.getString(2);
-                    String name = rs.getString(3);
-                    String path = rs.getString(4);
-                    int success = rs.getInt(5);
-                    return new DownFile(id, host, name, path, success);
-                });
-    }
 
-    static boolean checkFinished() {
-        return TaskManager.getRate().get() == TaskManager.getTotol().get();
-    }
 
-    private void executor() throws SQLException, ClassNotFoundException {
-        List<DownFile> files = getUnDownloadRecord();
-
-        if (files.size() == 0) {
-            return;
-        }
-
-        try {
+    static DownFile getTask() throws InterruptedException {
+        if (waitFile.size() == 0) {
+            List<DownFile> files = getUnDownloadRecord(1000);
             for (DownFile file : files) {
                 waitFile.put(file);
             }
-            System.out.println("共有文件" + TaskManager.getTotol() + "，已经下载 " + TaskManager.getRate() + ", 还需要下载文件：" + waitFile.size() + "个");
-        } catch (InterruptedException e) {
-            logger.error("put file to ArrayBlockingQueue error", e);
         }
-
-    }
-
-    static DownFile getTask() {
         return waitFile.poll();
     }
 

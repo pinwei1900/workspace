@@ -25,7 +25,7 @@ import util.FtpHelper;
  * @Date 2018/4/17
  * @Version 1.0.0
  */
-public class TaskManager {
+public class DbInitializer {
 
     private static SqlHelper sqlHelper;
 
@@ -73,8 +73,7 @@ public class TaskManager {
                     success = 1;
                     rate.incrementAndGet();
                 }
-                execList.add(
-                        "INSERT INTO fatch_down_file (host, name, path, success) VALUES ('" + host
+                execList.add("INSERT INTO fatch_down_file (host, name, path, success) VALUES ('" + host
                                 + "','" + name + "','" + url.getFile() + "'," + success + ");");
             }
             sqlHelper.executeUpdate(execList);
@@ -84,15 +83,19 @@ public class TaskManager {
         }
     }
 
-    static String updateAndProgress() {
-        return rate.incrementAndGet() + ":" + totol;
+    static boolean checkFinished() {
+        return rate.get() == totol.get();
     }
 
-    public static AtomicInteger getTotol() {
-        return totol;
+    static int updateRate() {
+        return rate.incrementAndGet();
     }
 
-    public static AtomicInteger getRate() {
-        return rate;
+    public static int getTotol() {
+        return totol.get();
+    }
+
+    public static int getRate() {
+        return rate.get();
     }
 }

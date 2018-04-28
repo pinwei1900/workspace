@@ -5,7 +5,9 @@
 package handler;
 
 import bean.DownFile;
+import db.SqlHelper;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -38,7 +40,7 @@ public class FatchLoader extends Thread {
             try {
                 DownFile task = TaskFinder.getTask();
                 if (task == null) {
-                    if (TaskFinder.checkFinished()) {
+                    if (DbInitializer.checkFinished()) {
                         break;
                     }
                     Thread.sleep(500);
@@ -69,14 +71,18 @@ public class FatchLoader extends Thread {
             try {
                 boolean success = ftpHelper.download(task);
                 if (success) {
-                    String prosess = TaskManager.updateAndProgress();
+                    new SqlHelper().executeUpdate("UPDATE fatch_down_file SET success = 1 WHERE id = " + task.getId() + ";");
+                    int prosess = DbInitializer.updateRate();
+                    int totol = DbInitializer.getTotol();
                     logger.info("task : {} download over , name = {} , progress：{} , time = {}",
-                            task.getId(), task.getName(), prosess, new Date());
+                            task.getId(), task.getName(), prosess + ":" + totol, new Date());
                 } else {
                     TaskFinder.addTask(task);
                 }
             } catch (InterruptedException e) {
                 logger.error("add task failed ，", e);
+            } catch (SQLException | ClassNotFoundException e) {
+                e.printStackTrace();
             }
 
         }
