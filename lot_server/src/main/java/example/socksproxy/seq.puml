@@ -1,0 +1,9 @@
+@startuml
+浏览器 -> 服务器channel : 请求
+服务器channel -> 客户端Bootstrap : 新建客户端
+客户端Bootstrap -> 网络资源 : 客户端发送请求connect
+
+网络资源 -> 客户端Bootstrap : 装配客户端channel到服务器channel
+客户端Bootstrap -> 服务器channel : 使用ctx.writeAndFlush(msg) 写到服务器
+服务器channel -> 浏览器 : 使用ctx.writeAndFlush(msg) 写到浏览器
+@enduml
