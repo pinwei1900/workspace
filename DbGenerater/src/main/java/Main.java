@@ -25,7 +25,7 @@ public class Main {
 
         Properties p = System.getProperties();
 
-
+        //之类不能设置，因为系统信息还有很多，会导致系统信息失效
         Properties pps = new Properties();
         pps.load(new FileInputStream("src\\main\\resources\\application.properties"));
         System.setProperties(pps);
