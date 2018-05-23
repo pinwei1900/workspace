@@ -2,7 +2,6 @@ package utils;
 
 import static org.junit.Assert.assertEquals;
 
-import db.DbProcess;
 import entry.TableInfo;
 import java.sql.SQLException;
 import org.junit.Test;

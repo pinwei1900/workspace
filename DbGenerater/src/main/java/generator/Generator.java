@@ -4,18 +4,20 @@
  */
 package generator;
 
-import entry.TableEntry;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
+import generator.combine.Combine;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.sql.SQLException;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * @Description
@@ -25,30 +27,35 @@ import java.util.Map;
  */
 public class Generator {
 
-    private static final Configuration cfg;
+    private static Configuration cfg;
 
     static {
-        cfg = new Configuration(Configuration.VERSION_2_3_22);
         try {
+            cfg = new Configuration(Configuration.VERSION_2_3_22);
             cfg.setDirectoryForTemplateLoading(new File("src/main/resources/templete/"));
+            cfg.setDefaultEncoding("UTF-8");
+            cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        cfg.setDefaultEncoding("UTF-8");
-        cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
     }
 
-    public static void generator(TableEntry table) throws IOException, TemplateException {
-        Map<String, Object> root = new HashMap<>();
+    public static void generator(Combine combine ,String templete)
+            throws IOException, TemplateException, SQLException {
+        Map<String, Object> root = setBaseTempleteInfo(combine);
+        Template temp = cfg.getTemplate(templete);
 
-        root.put("mail", "mailto:haosonglin@wxchina.com");
-        root.put("author", "songlin.Hao");
-        root.put("name", "");
-        root.put("field", "");
-        root.put("date", new Date().toString());
-
-        Template temp = cfg.getTemplate("Bean.ftl");
         Writer out = new OutputStreamWriter(System.out);
         temp.process(root, out);
+    }
+
+    private static Map<String, Object > setBaseTempleteInfo(Combine combine) {
+        Map<String, Object> map = combine.combine();
+        map.put("mail", "mailto:haosonglin@wxchina.com");
+        map.put("author", "songlin.Hao");
+        map.put("name", "");
+        map.put("field", "");
+        map.put("date", new Date().toString());
+        return map;
     }
 }

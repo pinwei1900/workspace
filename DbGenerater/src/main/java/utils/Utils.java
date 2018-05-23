@@ -49,7 +49,8 @@ public class Utils {
     public static Object queryField(String name, Class T) throws SQLException {
         Connection conn = ConnTools.makeConnection();
         QueryRunner qRunner = new QueryRunner();
-        return qRunner.query(conn, "show full columns from " + name, new BeanListHandler(T));
+        String sql = "SELECT COLUMN_NAME AS field, DATA_TYPE AS type, COLUMN_COMMENT AS comment FROM information_schema.`COLUMNS` WHERE TABLE_SCHEMA LIKE 'lot' AND TABLE_NAME LIKE '"+name+"';";
+        return qRunner.query(conn, sql, new BeanListHandler(T));
     }
 
 }

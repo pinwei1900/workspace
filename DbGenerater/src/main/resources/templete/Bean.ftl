@@ -1,6 +1,8 @@
 import lombok.Data;
 
 @Data
-public class ${name} {
+public class ${filename} {
+<#list fields as field>
     ${field}
+</#list>
 }

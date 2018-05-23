@@ -3,6 +3,7 @@ package utils;
 import entry.TableEntry;
 import freemarker.template.TemplateException;
 import generator.Generator;
+import generator.combine.BeanCombine;
 import java.io.IOException;
 import java.sql.SQLException;
 import org.junit.Test;
@@ -17,7 +18,6 @@ public class GeneratorTest {
 
     @Test
     public void UpcaseFirstLetter() throws IOException, TemplateException, SQLException {
-        TableEntry table = new TableEntry("lot_audit");
-        Generator.generator(table);
+        Generator.generator(new BeanCombine("lot_audit"),"Bean.ftl");
     }
 }

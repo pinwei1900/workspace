@@ -3,13 +3,14 @@
  *             All rights reserved                         
  */
 
-import entry.TableEntry;
+
+import config.Configuration;
 import freemarker.template.TemplateException;
 import generator.Generator;
-import java.io.FileInputStream;
+import generator.combine.BeanCombine;
+import generator.combine.DaoCombine;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Properties;
 
 /**
  * @Description
@@ -20,18 +21,10 @@ import java.util.Properties;
 public class Main {
 
     public static void main(String[] args) throws SQLException, IOException, TemplateException {
-        String targetName = "lot_audit";
-        TableEntry table = new TableEntry(targetName);
 
-        Properties p = System.getProperties();
+        Configuration.init("src/main/resources/typemap.properties");
 
-        //之类不能设置，因为系统信息还有很多，会导致系统信息失效
-        Properties pps = new Properties();
-        pps.load(new FileInputStream("src\\main\\resources\\application.properties"));
-        System.setProperties(pps);
-        
-
-        Generator.generator(table);
-
+        Generator.generator(new BeanCombine("lot_audit"), "Bean.ftl");
+        Generator.generator(new DaoCombine("lot_audit"), "Bean.ftl");
     }
 }
