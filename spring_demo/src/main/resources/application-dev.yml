@@ -1,0 +1,29 @@
+my:
+  name: haosonglin
+  age: 10
+  number: ${random.int}
+  uuid: ${random.uuid}
+  max: ${random.int(10)}
+  value: ${random.value}
+  greeting: hi,i'm ${my.name}
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://119.23.200.215:3306/test?useSSL=false&useUnicode=true&characterEncoding=UTF-8
+    username: user
+    password: 123456
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+  redis:
+    host: 172.16.0.48
+    port: 6379
+    password:
+    database: 1
+    jedis:
+      pool:
+        max-active: 8
+        max-wait: -1
+        max-idle: 500
