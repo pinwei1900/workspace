@@ -1,0 +1,12 @@
+http://localhost:8080/ 开放的接口url
+http://localhost:8081/actuator 监控接口url
+http://localhost:8080/swagger-ui.html API接口相关
+
+
+关于这个项目自己的学习点：
+spring boot的简单运用
+自动创建数据库信息
+配置信息的分开使用
+注入配置属性的方法
+开放api接口的方法
+项目内监控方式
