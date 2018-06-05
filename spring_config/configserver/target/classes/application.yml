@@ -1,0 +1,23 @@
+server:
+  port: 8769
+
+spring:
+  cloud:
+    config:
+      server:
+#        native:
+#          search-locations: classpath:/config
+        git:
+          uri: https://github.com/pinwei1900/workspace
+          username: pinwei1900
+          passphrase: hsl13571676728
+
+  profiles:
+    active: native
+  application:
+    name: config-server
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+
