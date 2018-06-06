@@ -1,6 +1,11 @@
 spring:
   application:
     name: config-client
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
   cloud:
     config:
       uri: http://127.0.0.1:8769
@@ -13,3 +18,10 @@ eureka:
       defaultZone: http://localhost:8761/eureka/
 server:
   port: 8762
+management:
+  security:
+    enabled: false
+
+
+
+
