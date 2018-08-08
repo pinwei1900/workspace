@@ -21,6 +21,8 @@ public class Main {
     static float f;
     static double g;
 
+
+
     public static void main(String[] args) {
         new Main().print(a);
         new Main().print(b);
@@ -30,6 +32,7 @@ public class Main {
         new Main().print(e);
         new Main().print(f);
         new Main().print(g);
+
     }
 
     private void print(Object object) {
