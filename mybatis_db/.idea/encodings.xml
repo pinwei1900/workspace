@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/springbootfileupload" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/springbootfileupload/src/main/resources/templates/from_file.html" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/springbootjpathymeleafcurd" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/springbootmybatismulidatasource" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/springbootmybatisxml" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/springbootrabbitmq" charset="UTF-8" />
+  </component>
+</project>
